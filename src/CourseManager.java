@@ -15,6 +15,7 @@ import java.util.Scanner;
  * Holds courses and provides operations for managing them.
  */
 public class CourseManager {
+    private static final Path DATA_FILE = Paths.get("data", "courses.txt");
     private final List<Course> courses = new ArrayList<>();
 
     /**
@@ -116,14 +117,94 @@ public class CourseManager {
         System.out.println("No course found with code " + searchCode + ".");
     }
 
-    /**
-     * Calculates and displays the sum of the units for all stored courses.
-     */
-    public void computeTotalUnits() {
+    /** Updates the title and units for an existing course. */
+    public void updateCourse(Scanner scanner) {
+        if (courses.isEmpty()) {
+            System.out.println("There are no courses to update.");
+            return;
+        }
+
+        System.out.print("Enter the course code to update: ");
+        String code = scanner.nextLine().trim().toUpperCase(Locale.ROOT);
+        Course existing = findCourse(code);
+        if (existing == null) {
+            System.out.println("No course found with code " + code + ".");
+            return;
+        }
+
+        System.out.print("Enter new course title: ");
+        String title = scanner.nextLine().trim();
+        if (title.isEmpty() || title.contains("|")) {
+            System.out.println("Course title must be non-blank and cannot contain |.");
+            return;
+        }
+
+        System.out.print("Enter new course unit (positive whole number): ");
+        String unitInput = scanner.nextLine().trim();
+        try {
+            int units = Integer.parseInt(unitInput);
+            if (units <= 0) {
+                throw new NumberFormatException();
+            }
+            courses.set(courses.indexOf(existing), new Course(code, title, units));
+            System.out.println("Course updated successfully.");
+        } catch (NumberFormatException exception) {
+            System.out.println("Units must be a positive whole number. Course was not updated.");
+        }
+    }
+
+    /** Removes a course by code after asking for confirmation. */
+    public void removeCourse(Scanner scanner) {
+        if (courses.isEmpty()) {
+            System.out.println("There are no courses to remove.");
+            return;
+        }
+
+        System.out.print("Enter the course code to remove: ");
+        String code = scanner.nextLine().trim().toUpperCase(Locale.ROOT);
+        Course existing = findCourse(code);
+        if (existing == null) {
+            System.out.println("No course found with code " + code + ".");
+            return;
+        }
+
+        System.out.print("Remove " + existing.getCourseTitle() + "? (y/n): ");
+        if (scanner.nextLine().trim().equalsIgnoreCase("y")) {
+            courses.remove(existing);
+            System.out.println("Course removed successfully.");
+        } else {
+            System.out.println("Course was not removed.");
+        }
+    }
+
+    private Course findCourse(String code) {
+        for (Course course : courses) {
+            if (course.getCourseCode().equals(code)) {
+                return course;
+            }
+        }
+        return null;
+    }
+
+    /** Returns the number of courses currently held in memory. */
+    public int getCourseCount() {
+        return courses.size();
+    }
+
+    /** Returns the total units currently held in memory. */
+    public int getTotalUnits() {
         int totalUnits = 0;
         for (Course course : courses) {
             totalUnits += course.getCourseUnit();
         }
+        return totalUnits;
+    }
+
+    /**
+     * Calculates and displays the sum of the units for all stored courses.
+     */
+    public void computeTotalUnits() {
+        int totalUnits = getTotalUnits();
 
         if (courses.isEmpty()) {
             System.out.println("No courses have been added, so the total is 0 units.");
@@ -138,12 +219,11 @@ public class CourseManager {
      * Invalid records are skipped with a message.
      */
     public void loadCoursesFromFile() {
-        Path filePath = Paths.get("data", "courses.txt");
         List<Course> loadedCourses = new ArrayList<>();
         Set<String> loadedCodes = new HashSet<>();
 
         try {
-            List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+            List<String> lines = Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8);
             int skippedRecords = 0;
 
             for (int index = 0; index < lines.size(); index++) {
@@ -174,28 +254,36 @@ public class CourseManager {
 
             courses.clear();
             courses.addAll(loadedCourses);
-            System.out.println("Loaded " + loadedCourses.size() + " course(s) from " + filePath + ".");
+            System.out.println("Loaded " + loadedCourses.size() + " course(s) from " + DATA_FILE + ".");
             if (skippedRecords > 0) {
                 System.out.println("Skipped " + skippedRecords + " invalid or duplicate record(s).");
             }
         } catch (IOException exception) {
-            System.out.println("Could not load courses: " + exception.getMessage());
+            System.out.println("Could not load courses from " + DATA_FILE + ": " + exception.getMessage());
         }
     }
     /**
      * Saves every course to data/courses.txt using code|title|units per line.
      */
     public void saveCoursesToFile() {
-        Path filePath = Paths.get("data", "courses.txt");
+        try {
+            Path parent = DATA_FILE.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+        } catch (IOException exception) {
+            System.out.println("Could not prepare the data folder: " + exception.getMessage());
+            return;
+        }
 
-        try (BufferedWriter writer = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(DATA_FILE, StandardCharsets.UTF_8)) {
             for (Course course : courses) {
                 writer.write(course.getCourseCode() + "|"
                         + course.getCourseTitle() + "|"
                         + course.getCourseUnit());
                 writer.newLine();
             }
-            System.out.println("Saved " + courses.size() + " course(s) to " + filePath + ".");
+            System.out.println("Saved " + courses.size() + " course(s) to " + DATA_FILE + ".");
         } catch (IOException exception) {
             System.out.println("Could not save courses: " + exception.getMessage());
         }

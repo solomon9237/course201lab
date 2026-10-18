@@ -1,38 +1,98 @@
-# Student Course Management Mini-System
+# Student Course Management System
 
-**Course:** COS 201 Programming I  
-**Assessment:** Mid-Semester Lab Assessment  
-**Language:** Java
+A Java-based console application for managing a student's course list. The system allows a user to add courses, view course details, search by code, calculate total units, and save or load course data from a text file.
 
-A course management application with a console interface and an optional local browser interface. The project follows the requirements checklist supplied for the assessment.
+## Overview
 
-## Project structure
+This project is a simple course management system designed to demonstrate core Java concepts such as:
 
-- `src/Course.java` - course data model and validation
-- `src/CourseManager.java` - console features, collection handling, file I/O, and recursive listing
-- `src/Main.java` - seven-option console menu
-- `src/WebServer.java` - browser interface at `http://127.0.0.1:8000`
-- `data/courses.txt` - saved course records in `code|title|units` format
-- `docs/assessment-report.md` - report draft; fill in your name and date and personalize the challenges section
-- `docs/demo-checklist.md` - run and screenshot steps
-- `docs/submission-checklist.md` - assessment requirement map and final items to submit
+- object-oriented programming
+- data validation
+- ArrayList-based storage
+- recursion for display output
+- reading and writing text files
+- user interaction through a console menu
 
-## Run the console version
+## Project Structure
 
-From the project root in PowerShell:
+- `src/Course.java` — represents a single course and validates its data
+- `src/CourseManager.java` — stores and manages courses, performs searches and file operations
+- `src/Main.java` — console interface and menu loop
+- `data/courses.txt` — saved course records in a pipe-delimited format
+
+## Features
+
+- Add a course with a code, title, and unit value
+- Prevent duplicate course codes
+- View all courses in the system
+- Search a course by code (case-insensitive)
+- Calculate the total units for all courses
+- Update a course title and unit value
+- Remove a course with confirmation
+- Save courses to a file
+- Load courses from a file
+- Exit the program cleanly
+
+## How to Run
+
+Make sure Java is installed, then open PowerShell in the project root and run:
 
 ```powershell
 javac -d out src\Course.java src\CourseManager.java src\Main.java
 java -cp out Main
 ```
 
-## Run the browser version
+## Run Requirement Tests
 
-Compile and start the local Java server:
+The project includes lightweight automated checks that require no external libraries:
 
 ```powershell
-javac -d out src\Course.java src\CourseManager.java src\Main.java src\WebServer.java
-java -cp out WebServer
+javac -d out src\Course.java src\CourseManager.java tests\RequirementsTest.java
+java -cp out RequirementsTest
 ```
 
-Open `http://127.0.0.1:8000` in a browser. Stop the server with **Ctrl+C** in its terminal. It listens on the local computer only. Run it from the project root so the relative data-file path works.
+## Menu Options
+
+When the program starts, it displays this menu:
+
+1. Add Course
+2. View All Courses
+3. Search Course by Code
+4. Compute Total Units
+5. Update Course
+6. Remove Course
+7. Save to File
+8. Load from File
+9. Exit Program
+
+## Data File Format
+
+The system stores courses in `data/courses.txt` using this format:
+
+```text
+COURSECODE|Course Title|Units
+```
+
+Example:
+
+```text
+COS201|Programming I|3
+MTH101|Discrete Mathematics|4
+ENG110|Academic Writing|2
+```
+
+## Validation Rules
+
+The program enforces these rules:
+
+- course code cannot be blank
+- course title cannot be blank
+- course code and title cannot contain `|`
+- units must be a positive whole number
+- course codes are stored in uppercase
+
+## Notes
+
+- The application runs from the project root so the data file path resolves correctly.
+- Loading a file replaces the current in-memory course list with the valid entries from the file.
+- Invalid or duplicate records are skipped with a message instead of crashing the program.
