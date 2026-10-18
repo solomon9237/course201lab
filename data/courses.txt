@@ -1,0 +1,2 @@
+COS203|Discret Structure|2
+COS201|programming|3
