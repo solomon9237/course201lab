@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Course Manager</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f6fb;color:#20253a;display:flex;min-height:100vh}
+    .sidebar{width:245px;background:#11182b;color:#fff;padding:34px 18px;flex-shrink:0}.brand{font-size:21px;font-weight:bold;margin:0 12px 5px}.subtitle{color:#9ba5c2;font-size:12px;margin:0 12px 48px}.menu-toggle{display:none}
+    .nav a{display:block;color:#c5cbe0;text-decoration:none;padding:14px 16px;border-radius:7px;margin:5px 0}.nav a:hover,.nav a.active{background:#27245d;color:#fff;border-left:3px solid #6555f4}
+    .main{flex:1;padding:34px 46px;max-width:1100px;min-width:0}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px;gap:20px}.topbar h1{font-size:29px;margin:0 0 6px}.topbar p{color:#7f8498;margin:0}.top-actions button{background:#fff;color:#60667d;border:1px solid #ddd;margin-left:6px}
+    .card{background:#fff;padding:27px;border-radius:5px;box-shadow:0 2px 8px #e0e1e8;margin-bottom:20px;max-width:760px;overflow-x:auto}.card h2{margin-top:0;font-size:18px}.card p{color:#72778a}.card form{display:flex;flex-direction:column;gap:8px;max-width:650px}.card label{font-size:11px;text-transform:uppercase;color:#74798d;font-weight:bold;margin-top:8px}.card input{padding:13px;border:1px solid #e1e2e9;border-radius:5px;font-size:16px;width:100%}
+    button{padding:13px 18px;border:0;border-radius:5px;background:#5948e8;color:#fff;font-weight:bold;cursor:pointer;margin-top:10px;min-height:44px}button.danger{background:#d94b5b}.stats{display:flex;gap:18px;margin-bottom:20px;flex-wrap:wrap}.stats div{background:#fff;padding:22px 30px;border-radius:5px;box-shadow:0 2px 8px #e0e1e8;min-width:170px;flex:1}.stats strong{display:block;font-size:28px;color:#5948e8}.stats span{color:#7f8498;font-size:13px}
+    table{width:100%;border-collapse:collapse;min-width:480px}th,td{text-align:left;padding:13px;border-bottom:1px solid #eee;white-space:nowrap}th{font-size:12px;color:#7f8498;text-transform:uppercase}.message{background:#e3f4ec;color:#21734a;padding:13px;border-radius:5px;max-width:760px;margin-bottom:20px}
+    @media(max-width:900px){.sidebar{width:205px}.main{padding:28px}.topbar h1{font-size:25px}}@media(max-width:640px){body{display:block}.sidebar{width:100%;padding:20px 16px}.brand{display:inline-block;margin:0 8px 2px}.subtitle{display:inline-block;margin:0;color:#9ba5c2}.menu-toggle{display:block;background:#27245d;width:100%;text-align:left;margin:18px 0 0}.sidebar .nav{display:none;margin-top:8px}.sidebar.open .nav{display:flex;flex-direction:column;gap:2px}.nav a{padding:11px 12px;margin:0;font-size:13px}.main{padding:22px 16px}.topbar{display:block;margin-bottom:24px}.topbar h1{font-size:23px}.topbar p{font-size:13px;line-height:1.5}.top-actions{margin-top:14px}.top-actions button{margin-left:0;margin-right:6px}.card{padding:20px}.stats{gap:10px}.stats div{min-width:130px;padding:17px}.stats strong{font-size:24px}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar"><p class="brand">COS 201</p><p class="subtitle">Course Manager</p><button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
+    <nav class="nav"><a href="#dashboard" data-view="dashboard">Dashboard</a><a href="#add" data-view="add">Add Course</a><a href="#search" data-view="search">Search Course</a><a href="#update" data-view="update">Update Course</a><a href="#remove" data-view="remove">Remove Course</a></nav>
+  </aside>
+  <main class="main"><header class="topbar"><div><h1>Student Course Management</h1><p>COS 201 Programming I | Lab Assessment Mini-System</p></div><div class="top-actions"><button onclick="loadCourses()">Load</button><button onclick="saveCourses()">Save</button></div></header><div id="message"></div><div id="app"></div></main>
+  <script>
+    const defaultCourses=[{code:'COS203',title:'Discret Structure',units:2},{code:'COS201',title:'programming',units:3}];
+    let courses=JSON.parse(localStorage.getItem('studentCourses')||'null')||defaultCourses;
+    let view=location.hash.slice(1)||'dashboard';
+    const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    function toggleMenu(){document.getElementById('sidebar').classList.toggle('open')}
+    function notice(text,error=false){const el=document.getElementById('message');el.innerHTML=text?`<p class="message" style="${error?'background:#fde8e8;color:#a22':''}">${esc(text)}</p>`:''}
+    function render(){view=location.hash.slice(1)||'dashboard';document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===view));let content='';
+      if(view==='add')content=form('Add New Course','add','Course code','Course title','Units','Add Course');
+      else if(view==='search')content=`<section class="card"><h2>Search Course</h2><p>Find a course by its code.</p><form onsubmit="searchCourse(event)"><label>Course code</label><input id="searchCode" placeholder="e.g. COS201" required><button>Search Course</button></form><div id="searchResult"></div></section>`;
+      else if(view==='update')content=form('Update Course','update','Existing course code','New course title','New units','Update Course');
+      else if(view==='remove')content=`<section class="card"><h2>Remove Course</h2><p>Remove a course from the current list.</p><form onsubmit="removeCourse(event)"><label>Course code</label><input id="removeCode" placeholder="e.g. COS201" required><button class="danger">Remove Course</button></form></section>`;
+      else{const rows=courses.length?courses.map(c=>`<tr><td>${esc(c.code)}</td><td>${esc(c.title)}</td><td>${c.units}</td></tr>`).join(''):'<tr><td colspan="3">No courses available.</td></tr>';content=`<section class="stats"><div><strong>${courses.length}</strong><span>Courses</span></div><div><strong>${courses.reduce((n,c)=>n+c.units,0)}</strong><span>Total units</span></div></section><section class="card"><h2>All Courses</h2><table><tr><th>Code</th><th>Title</th><th>Units</th></tr>${rows}</table></section>`}
+      document.getElementById('app').innerHTML=content;document.getElementById('sidebar').classList.remove('open');}
+    function form(title,action,codeLabel,titleLabel,unitsLabel,button){return `<section class="card"><h2>${title}</h2><p>Enter the course details below.</p><form onsubmit="submitCourse(event,'${action}')"><label>${codeLabel}</label><input id="code" placeholder="e.g. COS201" required><label>${titleLabel}</label><input id="title" placeholder="e.g. Programming I" required><label>${unitsLabel}</label><input id="units" type="number" min="1" placeholder="e.g. 3" required><button>${button}</button></form></section>`}
+    function submitCourse(e,action){e.preventDefault();const code=document.getElementById('code').value.trim().toUpperCase(),title=document.getElementById('title').value.trim(),units=Number(document.getElementById('units').value);if(!code||!title||!units||units<1||code.includes('|')||title.includes('|'))return notice('Enter valid course details.',true);const found=courses.find(c=>c.code===code);if(action==='add'){if(found)return notice('A course with that code already exists.',true);courses.push({code,title,units});notice('Course added successfully.')}else{if(!found)return notice('No course found with that code.',true);found.title=title;found.units=units;notice('Course updated successfully.')}saveCourses(false);location.hash='dashboard';render()}
+    function searchCourse(e){e.preventDefault();const code=document.getElementById('searchCode').value.trim().toUpperCase(),found=courses.find(c=>c.code===code);document.getElementById('searchResult').innerHTML=found?`<p class="message">${esc(found.code)} — ${esc(found.title)} — ${found.units} units</p>`:'<p class="message" style="background:#fde8e8;color:#a22">Course not found.</p>'}
+    function removeCourse(e){e.preventDefault();const code=document.getElementById('removeCode').value.trim().toUpperCase(),index=courses.findIndex(c=>c.code===code);if(index<0)return notice('No course found with that code.',true);if(confirm('Remove this course?')){courses.splice(index,1);saveCourses(false);notice('Course removed successfully.');location.hash='dashboard';render()}}
+    function saveCourses(show=true){localStorage.setItem('studentCourses',JSON.stringify(courses));if(show)notice('Courses saved in this browser.')}
+    function loadCourses(){courses=JSON.parse(localStorage.getItem('studentCourses')||'null')||defaultCourses;render();notice('Courses loaded from this browser.')}
+    window.addEventListener('hashchange',render);render();
+  </script>
+</body>
+</html>
