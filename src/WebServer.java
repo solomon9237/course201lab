@@ -3,6 +3,7 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -18,12 +19,22 @@ public class WebServer {
         WebServer application = new WebServer();
         application.manager.loadCoursesFromFile();
 
-        application.server = HttpServer.create(new InetSocketAddress("127.0.0.1", PORT), 0);
+        application.server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
         application.server.createContext("/", application::handleRequest);
         application.server.setExecutor(null);
         application.server.start();
-        System.out.println("Course Manager website running at http://127.0.0.1:" + PORT);
+        System.out.println("Course Manager website running locally at http://127.0.0.1:" + PORT);
+        System.out.println("For phones/tablets on the same Wi-Fi, open http://"
+                + getLanAddress() + ":" + PORT);
         System.out.println("Press Ctrl+C to stop the server.");
+    }
+
+    private static String getLanAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (IOException exception) {
+            return "<your-computer-ip>";
+        }
     }
 
     private void handleRequest(HttpExchange exchange) throws IOException {
@@ -162,13 +173,13 @@ public class WebServer {
                     + "<section class='card'><h2>All Courses</h2><table><tr><th>Code</th><th>Title</th><th>Units</th></tr>" + rows + "</table></section>";
         }
         return "<!doctype html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Student Course Manager</title>"
-                + "<style>*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f6fb;color:#20253a;display:flex;min-height:100vh}.sidebar{width:245px;background:#11182b;color:white;padding:34px 18px;flex-shrink:0}.brand{font-size:21px;font-weight:bold;margin:0 12px 5px}.subtitle{color:#9ba5c2;font-size:12px;margin:0 12px 48px}.nav a{display:block;color:#c5cbe0;text-decoration:none;padding:14px 16px;border-radius:7px;margin:5px 0}.nav a:hover,.nav a.active{background:#27245d;color:white;border-left:3px solid #6555f4}.main{flex:1;padding:34px 46px;max-width:1100px}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px}.topbar h1{font-size:29px;margin:0 0 6px}.topbar p{color:#7f8498;margin:0}.top-actions form{display:inline}.top-actions button{background:white;color:#60667d;border:1px solid #ddd}.top-actions button.primary{background:#5948e8;color:white;border:0}.card{background:white;padding:27px;border-radius:5px;box-shadow:0 2px 8px #e0e1e8;margin-bottom:20px;max-width:760px}.card h2{margin-top:0;font-size:18px}.card p{color:#72778a}.card form{display:flex;flex-direction:column;gap:8px;max-width:650px}.card label{font-size:11px;text-transform:uppercase;color:#74798d;font-weight:bold;margin-top:8px}.card input{padding:13px;border:1px solid #e1e2e9;border-radius:5px;font-size:14px}.button,button{padding:13px 18px;border:0;border-radius:5px;background:#5948e8;color:white;font-weight:bold;cursor:pointer;margin-top:10px}button.danger{background:#d94b5b}.stats{display:flex;gap:18px;margin-bottom:20px}.stats div{background:white;padding:22px 30px;border-radius:5px;box-shadow:0 2px 8px #e0e1e8;min-width:170px}.stats strong{display:block;font-size:28px;color:#5948e8}.stats span{color:#7f8498;font-size:13px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:13px;border-bottom:1px solid #eee}th{font-size:12px;color:#7f8498;text-transform:uppercase}.message{background:#e3f4ec;color:#21734a;padding:13px;border-radius:5px;max-width:760px;margin-bottom:20px}@media(max-width:700px){.sidebar{width:180px}.main{padding:24px}.topbar{display:block}.top-actions{margin-top:15px}}"
-                + "</style></head><body><aside class='sidebar'><p class='brand'>COS 201</p><p class='subtitle'>Course Manager</p><nav class='nav'>"
+                + "<style>*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f6fb;color:#20253a;display:flex;min-height:100vh}.sidebar{width:245px;background:#11182b;color:white;padding:34px 18px;flex-shrink:0}.brand{font-size:21px;font-weight:bold;margin:0 12px 5px}.subtitle{color:#9ba5c2;font-size:12px;margin:0 12px 48px}.menu-toggle{display:none}.nav a{display:block;color:#c5cbe0;text-decoration:none;padding:14px 16px;border-radius:7px;margin:5px 0}.nav a:hover,.nav a.active{background:#27245d;color:white;border-left:3px solid #6555f4}.main{flex:1;padding:34px 46px;max-width:1100px;min-width:0}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px;gap:20px}.topbar h1{font-size:29px;margin:0 0 6px}.topbar p{color:#7f8498;margin:0}.top-actions form{display:flex;gap:8px}.top-actions button{background:white;color:#60667d;border:1px solid #ddd}.top-actions button.primary{background:#5948e8;color:white;border:0}.card{background:white;padding:27px;border-radius:5px;box-shadow:0 2px 8px #e0e1e8;margin-bottom:20px;max-width:760px;overflow-x:auto}.card h2{margin-top:0;font-size:18px}.card p{color:#72778a}.card form{display:flex;flex-direction:column;gap:8px;max-width:650px;min-width:240px}.card label{font-size:11px;text-transform:uppercase;color:#74798d;font-weight:bold;margin-top:8px}.card input{padding:13px;border:1px solid #e1e2e9;border-radius:5px;font-size:16px;width:100%}.button,button{padding:13px 18px;border:0;border-radius:5px;background:#5948e8;color:white;font-weight:bold;cursor:pointer;margin-top:10px;min-height:44px}button.danger{background:#d94b5b}.stats{display:flex;gap:18px;margin-bottom:20px;flex-wrap:wrap}.stats div{background:white;padding:22px 30px;border-radius:5px;box-shadow:0 2px 8px #e0e1e8;min-width:170px;flex:1}.stats strong{display:block;font-size:28px;color:#5948e8}.stats span{color:#7f8498;font-size:13px}table{width:100%;border-collapse:collapse;min-width:480px}th,td{text-align:left;padding:13px;border-bottom:1px solid #eee;white-space:nowrap}th{font-size:12px;color:#7f8498;text-transform:uppercase}.message{background:#e3f4ec;color:#21734a;padding:13px;border-radius:5px;max-width:760px;margin-bottom:20px}@media(max-width:900px){.sidebar{width:205px}.main{padding:28px}.topbar h1{font-size:25px}}@media(max-width:640px){body{display:block}.sidebar{width:100%;padding:20px 16px}.brand{display:inline-block;margin:0 8px 2px}.subtitle{display:inline-block;margin:0;color:#9ba5c2}.menu-toggle{display:block;background:#27245d;width:100%;text-align:left;margin:18px 0 0}.sidebar .nav{display:none;margin-top:8px}.sidebar.open .nav{display:flex;flex-direction:column;gap:2px}.nav a{padding:11px 12px;margin:0;font-size:13px}.main{padding:22px 16px}.topbar{display:block;margin-bottom:24px}.topbar h1{font-size:23px}.topbar p{font-size:13px;line-height:1.5}.top-actions{margin-top:14px}.top-actions form{width:100%}.top-actions button{flex:1}.card{padding:20px}.stats{gap:10px}.stats div{min-width:130px;padding:17px}.stats strong{font-size:24px}}"
+                + "</style></head><body><aside class='sidebar'><p class='brand'>COS 201</p><p class='subtitle'>Course Manager</p><button class='menu-toggle' onclick='toggleMenu()' aria-label='Open navigation'>☰ Menu</button><nav class='nav'>"
                 + navLink("dashboard", "Dashboard", view) + navLink("add", "Add Course", view) + navLink("search", "Search Course", view)
                 + navLink("update", "Update Course", view) + navLink("remove", "Remove Course", view) + "</nav></aside><main class='main'>"
                 + "<header class='topbar'><div><h1>Student Course Management</h1><p>COS 201 Programming I &nbsp;|&nbsp; Lab Assessment Mini-System</p></div><div class='top-actions'>"
                 + "<form method='post'><button name='action' value='load'>Load</button><button class='primary' name='action' value='save'>Save</button></form></div></header>"
-                + (message.isEmpty() ? "" : "<p class='message'>" + escape(message) + "</p>") + content + "</main></body></html>";
+                + (message.isEmpty() ? "" : "<p class='message'>" + escape(message) + "</p>") + content + "</main><script>function toggleMenu(){document.querySelector('.sidebar').classList.toggle('open');}</script></body></html>";
     }
 
     private String navLink(String target, String label, String selected) {

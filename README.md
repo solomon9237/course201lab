@@ -33,6 +33,7 @@ This project is a simple course management system designed to demonstrate core J
 - Remove a course with confirmation
 - Save courses to a file
 - Load courses from a file
+- Responsive browser layout for desktop, tablet, and mobile devices
 - Exit the program cleanly
 
 ## How to Run
@@ -54,7 +55,7 @@ java -cp out WebServer
 ```
 
 
-Then open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. You can add, view all, search by course code, update, remove, compute total units, save, load, and exit the program with the web controls. Stop the website with `Ctrl+C` in PowerShell if needed.
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000) on the desktop. The server also prints a LAN address such as `http://172.20.10.13:8000`; open that address on a phone or tablet connected to the same Wi-Fi. You can add, view all, search by course code, update, remove, compute total units, save, load, and exit the program with the web controls. Stop the website with `Ctrl+C` in PowerShell if needed.
 
 ## Run Requirement Tests
 
