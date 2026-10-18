@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Course Manager Website",
+			"type": "shell",
+			"command": "$out = 'out'; if (-not (Test-Path -LiteralPath $out)) { New-Item -ItemType Directory -Path $out | Out-Null }; javac -d $out src\\Course.java src\\CourseManager.java src\\WebServer.java; if ($LASTEXITCODE -eq 0) { java -cp $out WebServer }",
+			"isBackground": true,
+			"group": "build"
+		}
+	]
+}

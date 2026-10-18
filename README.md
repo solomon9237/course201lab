@@ -1,6 +1,7 @@
 # Student Course Management System
 
-A Java-based console application for managing a student's course list. The system allows a user to add courses, view course details, search by code, calculate total units, and save or load course data from a text file.
+A Java-based console and local browser application for managing a student's course list. The system allows a user to add courses, view course details, search by code, calculate total units, and save or load course data from a text file.
+
 
 ## Overview
 
@@ -18,6 +19,7 @@ This project is a simple course management system designed to demonstrate core J
 - `src/Course.java` — represents a single course and validates its data
 - `src/CourseManager.java` — stores and manages courses, performs searches and file operations
 - `src/Main.java` — console interface and menu loop
+- `src/WebServer.java` — local browser interface at `http://127.0.0.1:8000`
 - `data/courses.txt` — saved course records in a pipe-delimited format
 
 ## Features
@@ -41,6 +43,18 @@ Make sure Java is installed, then open PowerShell in the project root and run:
 javac -d out src\Course.java src\CourseManager.java src\Main.java
 java -cp out Main
 ```
+
+## Run the Website
+
+Compile and start the local web interface:
+
+```powershell
+javac -d out src\Course.java src\CourseManager.java src\WebServer.java
+java -cp out WebServer
+```
+
+
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. You can add, view all, search by course code, update, remove, compute total units, save, load, and exit the program with the web controls. Stop the website with `Ctrl+C` in PowerShell if needed.
 
 ## Run Requirement Tests
 

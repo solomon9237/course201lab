@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.Collections;
 
 /**
  * Holds courses and provides operations for managing them.
@@ -178,12 +179,44 @@ public class CourseManager {
     }
 
     private Course findCourse(String code) {
+        String normalizedCode = code == null ? "" : code.trim().toUpperCase(Locale.ROOT);
         for (Course course : courses) {
-            if (course.getCourseCode().equals(code)) {
+            if (course.getCourseCode().equals(normalizedCode)) {
                 return course;
             }
         }
         return null;
+    }
+
+    /** Adds a course for non-console clients such as the web interface. */
+    public void addCourse(String code, String title, int units) {
+        if (findCourse(code) != null) {
+            throw new IllegalArgumentException("A course with that code already exists.");
+        }
+        courses.add(new Course(code, title, units));
+    }
+
+    /** Updates a course for non-console clients such as the web interface. */
+    public void updateCourse(String code, String title, int units) {
+        Course existing = findCourse(code);
+        if (existing == null) {
+            throw new IllegalArgumentException("No course found with code " + code + ".");
+        }
+        courses.set(courses.indexOf(existing), new Course(existing.getCourseCode(), title, units));
+    }
+
+    /** Removes a course for non-console clients such as the web interface. */
+    public void removeCourse(String code) {
+        Course existing = findCourse(code);
+        if (existing == null) {
+            throw new IllegalArgumentException("No course found with code " + code + ".");
+        }
+        courses.remove(existing);
+    }
+
+    /** Provides a read-only view of the current courses for display. */
+    public List<Course> getCourses() {
+        return Collections.unmodifiableList(courses);
     }
 
     /** Returns the number of courses currently held in memory. */
